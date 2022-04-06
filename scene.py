@@ -1,5 +1,7 @@
 import pygame
 from button import Button
+from spinner import Point, EvenSpinnerFactory
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SPINNER_RADIUS, SEGMENTS, COLORS
 
 class SceneBase:
   def __init__(self):
@@ -27,12 +29,19 @@ class TitleScene(SceneBase):
     width = 200
     height = 75
     buff = 15
-    button_text = ["QUICK START", "CUSTOM", "LOAD"]
+    center = Point(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+    spinner_factory = EvenSpinnerFactory(SPINNER_RADIUS, center, SEGMENTS, COLORS)
+    spinner = spinner_factory.create_spinner()
+    button_info = {
+      "QUICK START": SpinnerScene(spinner),
+      "CUSTOM": None,
+      "LOAD": None
+    }
     step = height + buff
     self.buttons = []
     i = 0
-    for text in button_text:
-      button = Button((screen_w - width)/2, screen_h/4 + i*step, width, height, text)
+    for text, next_scene in button_info.items():
+      button = Button((screen_w - width)/2, screen_h/4 + i*step, width, height, text, next_scene)
       self.buttons.append(button)
       i += 1
 
@@ -42,7 +51,8 @@ class TitleScene(SceneBase):
         pos = pygame.mouse.get_pos()
         for button in self.buttons:
           if button.rect.collidepoint(pos):
-            print("clicked")
+            print("switch")
+            self.switch_to_scene(button.next_scene)
   
   def update(self):
     pass

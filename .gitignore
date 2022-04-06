@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# VIM Undo Files
+*.un
+*.un~
+
+*~

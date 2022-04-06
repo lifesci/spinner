@@ -1,19 +1,8 @@
-# spinner
-
 import math
 import pygame
 
 from dataclasses import dataclass
 from typing import List
-
-pygame.init()
-
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 500
-GREY = (100, 100, 100)
-SPINNER_RADIUS = min(SCREEN_WIDTH, SCREEN_HEIGHT)/4
-SEGMENTS = 16
-COLORS = ((255, 0 , 0), (0, 0, 255))
 
 def pct_to_rad(pct):
   return 2*math.pi*pct
@@ -71,18 +60,17 @@ class Triangle:
       yield tuple(point)
 
 class Spinner:
-  def __init__(self, surface:pygame.Surface, radius:float, center:Point, triangles:List[Triangle], colors:List[int]):
+  def __init__(self, radius:float, center:Point, triangles:List[Triangle], colors:List[int]):
     self.triangles: list[Triangle] = triangles
     self.radius = radius
     self.center = center
     self.colors = colors
     self.num_colors = len(colors)
-    self.surface = surface
 
-  def draw(self):
+  def draw(self, surface):
     i = 0
     for triangle in self.triangles:
-      pygame.draw.polygon(self.surface, color=self.colors[i%self.num_colors], points=tuple(triangle))
+      pygame.draw.polygon(surface, color=self.colors[i%self.num_colors], points=tuple(triangle))
       i += 1
 
   def rotate(self, angle):
@@ -92,8 +80,7 @@ class Spinner:
     self.triangles = rotated
 
 class EvenSpinnerFactory:
-  def __init__(self, surface, radius, center, segments, colors):
-    self.surface = surface
+  def __init__(self, radius, center, segments, colors):
     self.center = center
     self.radius = radius
     self.segments = segments
@@ -123,32 +110,4 @@ class EvenSpinnerFactory:
       triangle = self._get_next_triangle(used, size)
       triangles.append(triangle)
       used += size
-    return Spinner(self.surface, self.radius, self.center, triangles, self.colors)
-
-screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
-
-running = True
-clock = pygame.time.Clock()
-
-spinner = None
-
-CENTER = Point(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
-
-while running:
-  screen.fill(GREY)
-
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-      running = False
-    elif spinner:
-      spinner.rotate(1/30)
-
-    if not spinner:
-      factory = EvenSpinnerFactory(screen, SPINNER_RADIUS, CENTER, SEGMENTS, COLORS)
-      spinner = factory.create_spinner()
-
-    spinner.draw()
-
-    pygame.display.flip()
-
-pygame.quit()
+    return Spinner(self.radius, self.center, triangles, self.colors)

@@ -33,8 +33,7 @@ class TitleScene(SceneBase):
     spinner_factory = EvenSpinnerFactory(SPINNER_RADIUS, center, SEGMENTS, COLORS)
     spinner = spinner_factory.create_spinner()
     button_info = {
-      "QUICK START": SpinnerScene(spinner),
-      "CUSTOM": None,
+      "CREATE": None,
       "LOAD": None
     }
     step = height + buff
@@ -74,3 +73,8 @@ class SpinnerScene(SceneBase):
 
   def render(self, screen):
     self.spinner.draw(screen)
+
+
+def CreateScene(SceneBase):
+  def __init__(self):
+    pass

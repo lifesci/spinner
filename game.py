@@ -35,10 +35,10 @@ def run_game(active_scene):
             else:
                 filtered_events.append(event)
 
-            # if not spinner:
-            #   factory = EvenSpinnerFactory(SPINNER_RADIUS, CENTER, SEGMENTS, COLORS)
-            #   spinner = factory.create_spinner()
-            #   active_scene = SpinnerScene(spinner)
+            if not spinner:
+                factory = EvenSpinnerFactory(SPINNER_RADIUS, CENTER, SEGMENTS, COLORS)
+                spinner = factory.create_spinner()
+                active_scene = SpinnerScene(spinner)
 
             active_scene.process_events(filtered_events)
         active_scene.update()

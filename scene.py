@@ -117,7 +117,7 @@ class SpinnerScene(SceneBase):
         pass
 
     def update(self):
-        self.spinner.rotate(1 / 30)
+        self.spinner.rotate(1 / 360)
 
     def render(self, screen):
         self.spinner.draw(screen)

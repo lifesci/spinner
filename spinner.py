@@ -9,22 +9,26 @@ def pct_to_rad(pct):
     return 2 * math.pi * pct
 
 
+def point_to_angle(point, radius):
+    acos = math.acos(point.x / radius)
+
+    if point.y > 0:
+        angle = acos
+    else:
+        angle = 2 * math.pi - acos
+
+    return angle
+
+
 @dataclass
 class Point:
     x: float
     y: float
 
     def rotate(self, angle, radius, center):
-        x_offset = self.x - center.x
-        y_offset = center.y - self.y
+        offset_point = self - center
 
-        acos = math.acos(x_offset / radius)
-        asin = math.asin(y_offset / radius)
-
-        if y_offset > 0:
-            start_angle = acos
-        else:
-            start_angle = 2 * math.pi - acos
+        start_angle = point_to_angle(offset_point, radius)
 
         angle_offset = pct_to_rad(angle)
         new_angle = start_angle + angle_offset
@@ -35,6 +39,9 @@ class Point:
 
     def __add__(self, other):
         return Point(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other):
+        return Point(self.x - other.x, other.y - self.y)
 
     def __iter__(self):
         for val in (self.x, self.y):
@@ -74,11 +81,44 @@ class Spinner:
         self.colors = colors
         self.num_colors = len(colors)
 
+        left = center.x - radius
+        top = center.y - radius
+        width = 2 * radius
+        height = 2 * radius
+        self.rect = pygame.Rect(left, top, width, height)
+
     def draw(self, surface):
         i = 0
         for triangle in self.triangles:
-            pygame.draw.polygon(
-                surface, color=self.colors[i % self.num_colors], points=tuple(triangle)
+            # pygame.draw.polygon(
+            #     surface, color=self.colors[i % self.num_colors], points=tuple(triangle)
+            # )
+            p1 = triangle.points[0]
+            p2 = triangle.points[1]
+            color = self.colors[i % self.num_colors]
+            pygame.draw.line(
+                surface,
+                color=color,
+                start_pos=tuple(self.center),
+                end_pos=tuple(p1),
+            )
+            pygame.draw.line(
+                surface,
+                color=color,
+                start_pos=tuple(self.center),
+                end_pos=tuple(p2),
+            )
+
+            p1_offset = p1 - self.center
+            p2_offset = p2 - self.center
+            p1_angle = point_to_angle(p1_offset, self.radius)
+            p2_angle = point_to_angle(p2_offset, self.radius)
+            pygame.draw.arc(
+                surface,
+                color=color,
+                rect=self.rect,
+                start_angle=p1_angle,
+                stop_angle=p2_angle,
             )
             i += 1
 

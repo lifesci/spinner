@@ -29,9 +29,7 @@ class MenuScene(SceneBase):
     def process_events(self, events):
         for event in events:
             for button in self.buttons:
-                next_scene = button.process_event(event)
-                if next_scene:
-                    self.switch_to_scene(next_scene)
+                button.process_event(event, self)
 
     def update(self):
         pass

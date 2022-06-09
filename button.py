@@ -27,26 +27,28 @@ class Button:
             return not self.rect.collidepoint(pos)
         return False
 
-    def process_event(self, event):
+    def process_event(self, event, scene):
         if self._clicked(event):
-            return self.next_scene
+            scene.switch_to_scene(self.next_scene)
 
 
 class Input(Button):
     def __init__(self, x, y, width, height, text, scene, next_scene):
         super().__init__(x, y, width, height, text, scene, next_scene)
         self.active = False
+        self.active_color = (255, 0, 0)
         self.text = ""
         self.font = pygame.font.Font(None, 32)
 
     def _validate_input(self, value):
         return True
 
-    def process_event(self, event):
+    def process_event(self, event, scene):
         if self._clicked(event):
             self.active = True
-        elif self._clicked_away(event):
-            self.active == False
+
+        if self._clicked_away(event):
+            self.active = False
 
         if self.active and event.type == pygame.KEYDOWN:
             if event.key == pygame.K_BACKSPACE:
@@ -60,7 +62,8 @@ class Input(Button):
     def draw(self, screen):
         self._set_text_surface()
         screen.blit(self.text_surface, (self.rect.x + 5, self.rect.y + 5))
-        pygame.draw.rect(screen, self.color, self.rect, 2)
+        color = self.active_color if self.active else self.color
+        pygame.draw.rect(screen, color, self.rect, 2)
 
 
 class NumericInput(Input):

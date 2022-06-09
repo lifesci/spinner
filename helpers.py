@@ -1,48 +1,40 @@
 import math
 
-def build_menu(
-  x,
-  y,
-  width,
-  height,
-  num_elements,
-  num_cols=1,
-  with_titles=False,
-  buffer_size=5
+
+def get_menu_positions(
+    x, y, width, height, num_elements, num_cols=1, buffer_size=5, proportions=None
 ):
+    num_rows = math.ceil(num_elements / num_cols)
 
-  num_rows = math.ceil(len(elements)/num_cols)
-  if with_titles:
-    num_rows += 1
-  
-  widths = _get_element_widths()
-  height = _get_element_height(num_rows, buffer_size)
+    widths = _get_element_widths(width, num_cols, buffer_size, proportions)
+    height = _get_element_height(height, num_rows, buffer_size)
 
-  positions = []
-  for i in range(num_elements):
-    row_pos = i%num_cols
-    cur_x = x + buffer_size
-    cur_y = y + buffer_size
-    width = widths[row_pos]
-    position = {
-      "x": cur_x,
-      "y": cur_y,
-      "width": width,
-      "height": height
-    }
-    positions.append(position)
+    positions = []
+    for i in range(num_elements):
+        row = i // num_cols
+        col = i % num_cols
 
-def _get_element_widths(self):
-  buffers = self.num_cols + 1
-  remaining_width = self.width - buffers*self.buffer_size
-  if self.col_data:
-    widths = [remaining_width*col["proportion"] for col in self.col_data]
-  else:
-    widths = [remaining_width]
-  return widths
+        width = widths[col]
+        x_pos = sum(widths[:col]) + buffer_size * (col + 1)
+        y_pos = height * row + buffer_size * (row + 1)
+        position = {"x": x_pos, "y": y_pos, "width": width, "height": height}
+        positions.append(position)
+
+    return positions
+
+
+def _get_element_widths(width, num_cols, buffer_size, proportions):
+    buffers = num_cols + 1
+    remaining_width = width - buffers * buffer_size
+    if proportions:
+        widths = [remaining_width * proportion for proportion in proportions]
+    else:
+        widths = [remaining_width]
+    return widths
+
 
 def _get_element_height(height, num_rows, buffer_size):
-  buffers = num_rows + 1
-  remaining_height = height - buffers*buffer_size
-  height =  remaining_height/num_rows
-  return height
+    buffers = num_rows + 1
+    remaining_height = height - buffers * buffer_size
+    height = remaining_height / num_rows
+    return height

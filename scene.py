@@ -1,8 +1,16 @@
 import pygame
 from button import Button, Input, NumericInput
-from spinner import Point, EvenSpinnerFactory
+from spinner import Point, SpinnerFactory
 from helpers import get_menu_positions
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SPINNER_RADIUS, SEGMENTS, COLORS
+from constants import (
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    CENTER,
+    SPINNER_RADIUS,
+    SEGMENTS,
+    COLORS,
+)
+from geom import SegmentInfo
 
 
 class SceneBase:
@@ -65,6 +73,7 @@ class TitleScene(MenuScene):
 class CreateScene(MenuScene):
     def __init__(self):
         MenuScene.__init__(self)
+        self.buttons = []
         screen_w, screen_h = pygame.display.get_surface().get_size()
         button_info = [
             ("Option Name", {"next": self, "cons": Button}),
@@ -73,6 +82,7 @@ class CreateScene(MenuScene):
             ("50", {"next": self, "cons": NumericInput}),
             ("", {"next": self, "cons": Input}),
             ("50", {"next": self, "cons": NumericInput}),
+            ("Create", {"next": self, "cons": Button}),
         ]
         positions = get_menu_positions(
             0,
@@ -83,7 +93,6 @@ class CreateScene(MenuScene):
             num_cols=2,
             proportions=[0.75, 0.25],
         )
-        self.buttons = []
         i = 0
         for text, info in button_info:
             next_scene = info["next"]
@@ -100,6 +109,37 @@ class CreateScene(MenuScene):
             )
             self.buttons.append(button)
             i += 1
+
+        self.create_button = self.buttons[-1]
+
+    def process_events(self, events):
+        MenuScene.process_events(self, events)
+        spinner_scene = self._build_spinner_scene()
+        self.create_button.next_scene = spinner_scene
+
+    def _build_spinner_scene(self):
+        segment_info = []
+        i = 0
+        try:
+            for inp in self.buttons[2:-1]:
+                if i % 2 == 0:
+                    label = inp.text
+                else:
+                    size = int(inp.text) / 100
+                    segment_info.append(SegmentInfo(label, size))
+                i += 1
+            total_size = sum(info.size for info in segment_info)
+            if total_size == 1:
+                spinner_factory = SpinnerFactory(
+                    SPINNER_RADIUS, CENTER, segment_info, COLORS
+                )
+                spinner = spinner_factory.create_spinner()
+                scene = SpinnerScene(spinner)
+                return scene
+            else:
+                return self
+        except ValueError:
+            return self
 
 
 class SpinnerScene(SceneBase):

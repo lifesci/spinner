@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import List
 
 from scene import TitleScene, SpinnerScene
-from spinner import Point, EvenSpinnerFactory
 from constants import *
 
 pygame.init()
@@ -20,8 +19,6 @@ screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
 clock = pygame.time.Clock()
 
-CENTER = Point(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-
 
 def run_game(active_scene):
     spinner = None
@@ -35,10 +32,10 @@ def run_game(active_scene):
             else:
                 filtered_events.append(event)
 
-            if not spinner:
-                factory = EvenSpinnerFactory(SPINNER_RADIUS, CENTER, SEGMENTS, COLORS)
-                spinner = factory.create_spinner()
-                active_scene = SpinnerScene(spinner)
+            # if not spinner:
+            #     factory = EvenSpinnerFactory(SPINNER_RADIUS, CENTER, SEGMENTS, COLORS)
+            #     spinner = factory.create_spinner()
+            #     active_scene = SpinnerScene(spinner)
 
             active_scene.process_events(filtered_events)
         active_scene.update()
